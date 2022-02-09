@@ -7,21 +7,17 @@ public class SinglyLinkedList<E> implements List<E> {
     private Node<E> head, tail;
     private int length;
 
-    private class Node<E>{
+    private static class Node<E> {
         E data;
         Node<E> next;
 
-        private Node(E data, Node<E> next){
+        private Node(E data, Node<E> next) {
             this(data);
             this.next = next;
         }
 
-        private Node(E data){
+        private Node(E data) {
             this.data = data;
-        }
-
-        private Node(){
-
         }
 
         private E getData() {
@@ -41,24 +37,16 @@ public class SinglyLinkedList<E> implements List<E> {
         }
     }
 
-    /**
-     * LinkedList constructor.
-     * Basically head member instance points dummy node.
-     */
-    public SinglyLinkedList(){
-        this.head = new Node<>();
-        this.tail = head;
-    }
-
     @Override
-    public boolean add(E e){
+    public boolean add(E e) {
         Node<E> newNode = new Node<>(e);
-        this.tail.setNext(newNode);
-        this.tail=newNode;
 
         if (length == 0)
-            this.head = this.tail;
+            this.head = newNode;
+        else
+            this.tail.setNext(newNode);
 
+        this.tail = newNode;
         length++;
         return true;
     }
@@ -67,58 +55,64 @@ public class SinglyLinkedList<E> implements List<E> {
     public void add(int index, E e) {
         if (index >= length || index < 0)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
-        else if (index == length - 1)
-            this.add(e);
         else if (index == 0)
             this.addFirst(e);
+        else if (index == length - 1)
+            this.add(e);
         else {
             Node<E> cursor = this.head;
-            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++) {
+            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
                 cursor = cursor.getNext();
-            }
             Node<E> newNode = new Node<>(e, cursor.getNext());
             cursor.setNext(newNode);
             length++;
         }
     }
 
-    public void addFirst(E e){
+    public void addFirst(E e) {
+        this.head = new Node<>(e, this.head);
         if (length == 0)
-            this.add(e);
-        else{
-            Node<E> newNode = new Node<>(e, this.head);
-            this.head = newNode;
-            length++;
-        }
+            this.tail = this.head;
+        length++;
     }
 
-    public E remove(){
+    public E remove() {
+        return this.remove(length - 1);
+    }
+
+    @Override
+    public E remove(int index) {
         if (length == 0)
-            throw new NoSuchElementException("List is Empty");
-        else{
+            throw new NoSuchElementException("List is empty");
+        else if (index < 0 || index >= length)
+            throw new IndexOutOfBoundsException("Index parameter is out of bound");
+        else if (index == 0)
+            return this.removeFirst();
+        else {
             Node<E> cursor = this.head;
-            E removedData = null;;
-            for(int cursorIndex = 0; cursorIndex != length - 2; cursorIndex++){
+            E removedData = null;
+            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++) {
                 cursor = cursor.getNext();
             }
             removedData = cursor.getNext().getData();
             cursor.setNext(null);
-            tail = cursor;
-
-            if()
-
+            this.tail = cursor;
             length--;
             return removedData;
         }
     }
 
-    @Override
-    public E remove(int index) {
-        return null;
-    }
-
-    public E removeFirst(){
-
+    public E removeFirst() {
+        if (length == 0)
+            throw new NoSuchElementException("List is empty");
+        else {
+            E removedData = this.head.getData();
+            this.head = this.head.getNext();
+            if (length == 1)
+                this.tail = this.head;
+            length--;
+            return removedData;
+        }
     }
 
     @Override
