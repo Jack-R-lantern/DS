@@ -3,64 +3,31 @@ package ds.linear.list;
 import java.util.*;
 
 public class SinglyLinkedList<E> implements List<E> {
-
     private Node<E> head, tail;
     private int length;
-
-    private static class Node<E> {
-        E data;
-        Node<E> next;
-
-        private Node(E data, Node<E> next) {
-            this(data);
-            this.next = next;
-        }
-
-        private Node(E data) {
-            this.data = data;
-        }
-
-        private E getData() {
-            return data;
-        }
-
-        private Node<E> getNext() {
-            return next;
-        }
-
-        private void setNext(Node<E> next) {
-            this.next = next;
-        }
-
-        private void setData(E data) {
-            this.data = data;
-        }
-    }
 
     @Override
     public boolean add(E e) {
         Node<E> newNode = new Node<>(e);
-
         if (length == 0)
-            this.head = newNode;
+            head = newNode;
         else
-            this.tail.setNext(newNode);
-
-        this.tail = newNode;
+            tail.setNext(newNode);
+        tail = newNode;
         length++;
         return true;
     }
 
     @Override
     public void add(int index, E e) {
-        if (index >= length || index < 0)
+        if (index > length || index < 0)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
         else if (index == 0)
-            this.addFirst(e);
-        else if (index == length - 1)
-            this.add(e);
+            addFirst(e);
+        else if (index == length)
+            add(e);
         else {
-            Node<E> cursor = this.head;
+            Node<E> cursor = head;
             for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
                 cursor = cursor.getNext();
             Node<E> newNode = new Node<>(e, cursor.getNext());
@@ -70,14 +37,14 @@ public class SinglyLinkedList<E> implements List<E> {
     }
 
     public void addFirst(E e) {
-        this.head = new Node<>(e, this.head);
+        head = new Node<>(e, head);
         if (length == 0)
-            this.tail = this.head;
+            tail = head;
         length++;
     }
 
     public E remove() {
-        return this.remove(length - 1);
+        return removeFirst();
     }
 
     @Override
@@ -87,16 +54,16 @@ public class SinglyLinkedList<E> implements List<E> {
         else if (index < 0 || index >= length)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
         else if (index == 0)
-            return this.removeFirst();
+            return removeFirst();
         else {
-            Node<E> cursor = this.head;
+            Node<E> cursor = head;
             E removedData = null;
-            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++) {
+            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
                 cursor = cursor.getNext();
-            }
             removedData = cursor.getNext().getData();
-            cursor.setNext(null);
-            this.tail = cursor;
+            cursor.setNext(cursor.getNext().getNext());
+            if (index == length - 1)
+                tail = cursor;
             length--;
             return removedData;
         }
@@ -106,10 +73,10 @@ public class SinglyLinkedList<E> implements List<E> {
         if (length == 0)
             throw new NoSuchElementException("List is empty");
         else {
-            E removedData = this.head.getData();
-            this.head = this.head.getNext();
+            E removedData = head.getData();
+            head = head.getNext();
             if (length == 1)
-                this.tail = this.head;
+                tail = head;
             length--;
             return removedData;
         }
@@ -117,7 +84,7 @@ public class SinglyLinkedList<E> implements List<E> {
 
     @Override
     public int size() {
-        return 0;
+        return length;
     }
 
     @Override
@@ -177,7 +144,6 @@ public class SinglyLinkedList<E> implements List<E> {
 
     @Override
     public void clear() {
-
     }
 
     @Override
@@ -213,5 +179,35 @@ public class SinglyLinkedList<E> implements List<E> {
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return null;
+    }
+
+    private static class Node<E> {
+        E data;
+        Node<E> next;
+
+        private Node(E data, Node<E> next) {
+            this(data);
+            this.next = next;
+        }
+
+        private Node(E data) {
+            this.data = data;
+        }
+
+        private E getData() {
+            return data;
+        }
+
+        private void setData(E data) {
+            this.data = data;
+        }
+
+        private Node<E> getNext() {
+            return next;
+        }
+
+        private void setNext(Node<E> next) {
+            this.next = next;
+        }
     }
 }
