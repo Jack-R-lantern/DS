@@ -9,14 +9,7 @@ public class SinglyLinkedList<E> implements List<E> {
 
     @Override
     public boolean add(E e) {
-        if (length == 0)
-            addFirst(e);
-        else {
-            Node<E> newNode = new Node<>(e);
-            tail.setNext(newNode);
-            tail = newNode;
-            length++;
-        }
+        add(length, e);
         return true;
     }
 
@@ -24,25 +17,27 @@ public class SinglyLinkedList<E> implements List<E> {
     public void add(int index, E e) {
         if (index > length || index < 0)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
-        else if (index == 0)
-            addFirst(e);
-        else if (index == length)
-            add(e);
-        else {
+
+        if (index == 0) {
+            head = new Node<>(e, head);
+            if (length == 0)
+                tail = head;
+        } else if (index == length) {
+            Node<E> newNode = new Node<>(e);
+            tail.setNext(newNode);
+            tail = newNode;
+        } else {
             Node<E> cursor = head;
             for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
                 cursor = cursor.getNext();
             Node<E> newNode = new Node<>(e, cursor.getNext());
             cursor.setNext(newNode);
-            length++;
         }
+        length++;
     }
 
     public void addFirst(E e) {
-        head = new Node<>(e, head);
-        if (length == 0)
-            tail = head;
-        length++;
+        add(0, e);
     }
 
     public E remove() {
@@ -55,33 +50,28 @@ public class SinglyLinkedList<E> implements List<E> {
             throw new NoSuchElementException("List is empty");
         else if (index < 0 || index >= length)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
-        else if (index == 0)
-            return removeFirst();
-        else {
+
+        E removedData = null;
+        if (index == 0) {
+            removedData = head.getData();
+            head = head.getNext();
+            if (length == 1)
+                tail = head;
+        } else {
             Node<E> cursor = head;
-            E removedData = null;
             for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
                 cursor = cursor.getNext();
             removedData = cursor.getNext().getData();
             cursor.setNext(cursor.getNext().getNext());
             if (index == length - 1)
                 tail = cursor;
-            length--;
-            return removedData;
         }
+        length--;
+        return removedData;
     }
 
     public E removeFirst() {
-        if (length == 0)
-            throw new NoSuchElementException("List is empty");
-        else {
-            E removedData = head.getData();
-            head = head.getNext();
-            if (length == 1)
-                tail = head;
-            length--;
-            return removedData;
-        }
+        return remove(0);
     }
 
     @Override
