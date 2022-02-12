@@ -1,22 +1,54 @@
 package ds.linear.list;
 
-
 import java.util.*;
 
-public class SinglyLinkedList<E> implements List<E> {
-    private Node<E> head, tail;
+public class DoublyCircularLinkedList<E> implements List<E> {
+
+    private Node<E> head;
     private int length;
+
+    private static class Node<E> {
+        E data;
+        Node<E> next, prev;
+
+        private Node(E data, Node<E> next, Node<E> prev) {
+            this(data);
+            this.next = next;
+            this.prev = prev;
+        }
+
+        private Node(E data) {
+            this.data = data;
+        }
+
+        private E getData() {
+            return data;
+        }
+
+        private Node<E> getNext() {
+            return next;
+        }
+
+        public Node<E> getPrev() {
+            return prev;
+        }
+
+        public void setPrev(Node<E> prev) {
+            this.prev = prev;
+        }
+
+        private void setNext(Node<E> next) {
+            this.next = next;
+        }
+
+        private void setData(E data) {
+            this.data = data;
+        }
+    }
 
     @Override
     public boolean add(E e) {
-        if (length == 0)
-            addFirst(e);
-        else {
-            Node<E> newNode = new Node<>(e);
-            tail.setNext(newNode);
-            tail = newNode;
-            length++;
-        }
+        add(length, e);
         return true;
     }
 
@@ -24,29 +56,32 @@ public class SinglyLinkedList<E> implements List<E> {
     public void add(int index, E e) {
         if (index > length || index < 0)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
-        else if (index == 0)
-            addFirst(e);
-        else if (index == length)
-            add(e);
-        else {
-            Node<E> cursor = head;
-            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
-                cursor = cursor.getNext();
-            Node<E> newNode = new Node<>(e, cursor.getNext());
-            cursor.setNext(newNode);
-            length++;
-        }
-    }
 
-    public void addFirst(E e) {
-        head = new Node<>(e, head);
-        if (length == 0)
-            tail = head;
+        Node<E> newNode = null;
+        if (length == 0) {
+            newNode = new Node<>(e);
+            newNode.setNext(newNode);
+            newNode.setPrev(newNode);
+            head = newNode;
+        } else {
+            Node<E> cursor = head;
+            for (int cursorIndex = 0; cursorIndex != index; cursorIndex++)
+                cursor = cursor.getNext();
+            newNode = new Node<>(e, cursor, cursor.getPrev());
+            newNode.getNext().setPrev(newNode);
+            newNode.getPrev().setNext(newNode);
+            if (index == 0)
+                head = newNode;
+        }
         length++;
     }
 
+    public void addFirst(E e) {
+        add(0, e);
+    }
+
     public E remove() {
-        return removeFirst();
+        return remove();
     }
 
     @Override
@@ -55,33 +90,27 @@ public class SinglyLinkedList<E> implements List<E> {
             throw new NoSuchElementException("List is empty");
         else if (index < 0 || index >= length)
             throw new IndexOutOfBoundsException("Index parameter is out of bound");
-        else if (index == 0)
-            return removeFirst();
-        else {
+
+        E removedData = null;
+        if (length == 1) {
+            removedData = head.getData();
+            head = null;
+        } else {
             Node<E> cursor = head;
-            E removedData = null;
-            for (int cursorIndex = 0; cursorIndex != index - 1; cursorIndex++)
+            for (int cursorIndex = 0; cursorIndex != index; cursorIndex++)
                 cursor = cursor.getNext();
-            removedData = cursor.getNext().getData();
-            cursor.setNext(cursor.getNext().getNext());
-            if (index == length - 1)
-                tail = cursor;
-            length--;
-            return removedData;
+            removedData = cursor.getData();
+            cursor.getPrev().setNext(cursor.getNext());
+            cursor.getNext().setPrev(cursor.getPrev());
+            if (index == 0)
+                head = cursor.getNext();
         }
+        length--;
+        return removedData;
     }
 
     public E removeFirst() {
-        if (length == 0)
-            throw new NoSuchElementException("List is empty");
-        else {
-            E removedData = head.getData();
-            head = head.getNext();
-            if (length == 1)
-                tail = head;
-            length--;
-            return removedData;
-        }
+        return remove(0);
     }
 
     @Override
@@ -146,6 +175,7 @@ public class SinglyLinkedList<E> implements List<E> {
 
     @Override
     public void clear() {
+
     }
 
     @Override
@@ -181,35 +211,5 @@ public class SinglyLinkedList<E> implements List<E> {
     @Override
     public List<E> subList(int fromIndex, int toIndex) {
         return null;
-    }
-
-    private static class Node<E> {
-        E data;
-        Node<E> next;
-
-        private Node(E data, Node<E> next) {
-            this(data);
-            this.next = next;
-        }
-
-        private Node(E data) {
-            this.data = data;
-        }
-
-        private E getData() {
-            return data;
-        }
-
-        private void setData(E data) {
-            this.data = data;
-        }
-
-        private Node<E> getNext() {
-            return next;
-        }
-
-        private void setNext(Node<E> next) {
-            this.next = next;
-        }
     }
 }
